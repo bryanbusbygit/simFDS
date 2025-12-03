@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>simFDS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- TOP STRIP -->
+  <header class="app-header">
+    <div class="shell header-inner">
+      <div class="brand-line">
+        <span class="brand-name"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="app-main">
+    <div class="shell">
+      <section class="workspace">
+        <!-- TITLE BAR -->
+        <header class="workspace-bar">
+          <div class="workspace-title"></div>
+          <div class="workspace-meta">simFDS · Graphviz · DOT</div>
+        </header>
+
+        <!-- CONTENT GRID -->
+        <div class="workspace-body">
+          <div class="grid">
+            <!-- LEFT COLUMN: SYSTEM -->
+            <section class="column column-left">
+              <article class="panel panel-system">
+                <header class="panel-header">
+                  <span class="panel-kicker">System</span>
+                  <span class="panel-title">Definition</span>
+                </header>
+                <div class="panel-body panel-body-system">
+                  <form method="post" action="/" class="system-form">
+                    <label for="system-textarea" class="field-label">
+                      simFDS input (.pds format)
+                    </label>
+                    <textarea id="system-textarea"
+                              name="system_text"
+                              spellcheck="false"
+                              class="field-textarea">{{ system_text }}</textarea>
+
+                    <div class="form-actions">
+                      <button type="submit"
+                              name="action"
+                              value="run"
+                              class="btn-run">
+                        Run
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </article>
+            </section>
+
+            <!-- RIGHT COLUMN: 2×2 GRID -->
+            <section class="column column-right">
+              <div class="quad">
+                <!-- STATE SPACE -->
+                <article class="panel">
+                  <header class="panel-header">
+                    <span class="panel-kicker">Graph</span>
+                    <span class="panel-title">State space</span>
+                  </header>
+                  <div class="panel-body">
+                    {% if statespace_svg %}
+                      <a href="{{ url_for('graph_view', kind='statespace') }}"
+                         target="_blank"
+                         class="graph-frame-link">
+                        <div class="graph-frame">
+                          {{ statespace_svg|safe }}
+                        </div>
+                      </a>
+                    {% else %}
+                      <div class="placeholder">
+                        Run simFDS to generate the state graph.
+                      </div>
+                    {% endif %}
+                  </div>
+                </article>
+
+                <!-- DEPENDENCY GRAPH -->
+                <article class="panel">
+                  <header class="panel-header">
+                    <span class="panel-kicker">Graph</span>
+                    <span class="panel-title">Dependency</span>
+                  </header>
+                  <div class="panel-body">
+                    {% if depgraph_svg %}
+                      <a href="{{ url_for('graph_view', kind='dependency') }}"
+                         target="_blank"
+                         class="graph-frame-link">
+                        <div class="graph-frame graph-frame--center">
+                          {{ depgraph_svg|safe }}
+                        </div>
+                      </a>
+                    {% else %}
+                      <div class="placeholder">
+                        Edges xᵢ → xⱼ given from the update rules.
+                      </div>
+                    {% endif %}
+                  </div>
+                </article>
+
+                <!-- LIMIT CYCLES -->
+                <article class="panel panel-output">
+                  <header class="panel-header">
+                    <span class="panel-kicker">Summary</span>
+                    <span class="panel-title">Limit cycles</span>
+                  </header>
+                  <div class="panel-body">
+                    {% if limitcycles_text %}
+                      <pre class="text-box">{{ limitcycles_text }}</pre>
+                    {% else %}
+                      <div class="placeholder">
+                        Contents of system-limitcycles.txt will appear here.
+                      </div>
+                    {% endif %}
+                  </div>
+                </article>
+
+                <!-- DOT EXPORT -->
+                <article class="panel panel-output">
+                  <header class="panel-header">
+                    <span class="panel-kicker">Export</span>
+                    <span class="panel-title">State space DOT</span>
+                  </header>
+                  <div class="panel-body">
+                    {% if statespace_dot %}
+                      <pre class="text-box">{{ statespace_dot }}</pre>
+                    {% else %}
+                      <div class="placeholder">
+                        Raw DOT of system-statespace.dot will appear here.
+                      </div>
+                    {% endif %}
+                  </div>
+                </article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
