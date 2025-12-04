@@ -11,7 +11,8 @@ from flask import Flask, render_template, request, session, redirect, url_for
 # ---------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent
 BIN_DIR = BASE_DIR / "bin"
-SIMFDS_PATH = BIN_DIR / "simFDS"
+# NOTE: binary is now named "unix" inside bin/
+SIMFDS_PATH = BIN_DIR / "unix"
 
 app = Flask(__name__)
 # For session storage of last system text (local dev, replace in production)
@@ -185,8 +186,16 @@ def compute_system_artifacts(system_text: str):
 
         # Run simFDS if binary exists
         if SIMFDS_PATH.exists():
-            run_command([str(SIMFDS_PATH), "system"], cwd=tmpdir)
-        # If it doesn't exist, UI will just show placeholders.
+            rc, out, err = run_command([str(SIMFDS_PATH), "system"], cwd=tmpdir)
+            if rc != 0:
+                # Log but don't crash; state space will remain empty.
+                print(
+                    f"simFDS failed with rc={rc}\nSTDOUT:\n{out}\nSTDERR:\n{err}",
+                    flush=True,
+                )
+        else:
+            # On Render, if you see this in logs, the binary isn't being seen.
+            print(f"simFDS binary not found at {SIMFDS_PATH}", flush=True)
 
         # State space DOT -> SVG
         ss_dot = tmpdir / "system-statespace.dot"
@@ -220,13 +229,9 @@ def compute_system_artifacts(system_text: str):
             if rc == 0 and dep_svg.exists():
                 depgraph_svg = dep_svg.read_text(encoding="utf-8")
 
-    app.logger.info(f"STATE SVG PATH: {statespace_svg}")
-    app.logger.info(
-        f"STATE SVG EXISTS: {Path(statespace_svg).exists() if statespace_svg else 'NONE'}"
-    )
-
     return statespace_svg, depgraph_svg, limitcycles_text, statespace_dot_text
-    
+
+
 # ---------------------------------------------------------
 # Routes
 # ---------------------------------------------------------
