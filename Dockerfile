@@ -5,12 +5,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
 
-ENV PYTHONUNBUFFERED=1
+# ensure simFDS is executable inside the container
+RUN chmod +x bin/simFDS
 
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV PYTHONUNBUFFERED=1
 CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:$PORT"]
