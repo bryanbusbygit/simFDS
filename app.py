@@ -220,9 +220,11 @@ def compute_system_artifacts(system_text: str):
             if rc == 0 and dep_svg.exists():
                 depgraph_svg = dep_svg.read_text(encoding="utf-8")
 
+    app.logger.info(f"STATE SVG PATH: {state_svg}")
+    app.logger.info(f"STATE SVG EXISTS: {Path(state_svg).exists() if state_svg else 'NONE'}")
+
     return statespace_svg, depgraph_svg, limitcycles_text, statespace_dot_text
-
-
+    
 # ---------------------------------------------------------
 # Routes
 # ---------------------------------------------------------
