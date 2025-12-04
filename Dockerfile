@@ -4,7 +4,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends graphviz \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /simFDS
 COPY . .
 
 # ensure simFDS is executable inside the container
