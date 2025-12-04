@@ -8,7 +8,7 @@ WORKDIR /simFDS
 COPY . .
 
 # ensure simFDS is executable inside the container
-RUN chmod +x bin/simFDS
+RUN chmod +x bin/unix
 
 RUN pip install --no-cache-dir -r requirements.txt
 
